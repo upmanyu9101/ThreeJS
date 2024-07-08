@@ -1,54 +1,66 @@
-// Create the scene
+import * as THREE from 'https://cdn.skypack.dev/three@0.134.0';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/loaders/GLTFLoader.js';
+
 const scene = new THREE.Scene();
-
-// Set up the camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+camera.position.set(0, 0, 5); // Adjust camera position
 
-// Set up the renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Add a simple geometric shape to represent India (replace this with a detailed model for a real application)
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-// Add basic lighting
-const ambientLight = new THREE.AmbientLight(0x404040);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-pointLight.position.set(10, 10, 10);
-scene.add(pointLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+directionalLight.position.set(0, 10, 0);
+scene.add(directionalLight);
 
-// Add interactivity
-let raycaster = new THREE.Raycaster();
-let mouse = new THREE.Vector2();
+const controls = new OrbitControls(camera, renderer.domElement);
 
-function onMouseMove(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
+const loader = new GLTFLoader();
+loader.load(
+    'monkey.glb', // Ensure the path is correct relative to main.js
+    function (gltf) {
+        const model = gltf.scene;
+        scene.add(model);
 
-window.addEventListener('mousemove', onMouseMove, false);
+        // Center the model
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center);
 
-function animate() {
-    requestAnimationFrame(animate);
+        // Optionally, enable animations
+        const animations = gltf.animations;
+        if (animations && animations.length) {
+            const mixer = new THREE.AnimationMixer(model);
+            animations.forEach((clip) => {
+                mixer.clipAction(clip).play();
+            });
 
-    // Update the raycaster with the camera and mouse position
-    raycaster.setFromCamera(mouse, camera);
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                mixer.update(0.01); // adjust time delta as needed
+                controls.update(); // update controls
+                renderer.render(scene, camera); // render scene
+            }
 
-    // Calculate objects intersecting the raycaster
-    const intersects = raycaster.intersectObjects(scene.children);
+            animate();
+        } else {
+            // Regular animation loop without animations
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update(); // update controls
+                renderer.render(scene, camera); // render scene
+            }
 
-    for (let i = 0; i < intersects.length; i++) {
-        intersects[i].object.material.color.set(0xff0000);
+            animate();
+        }
+    },
+    undefined,
+    function (error) {
+        console.error('Error loading model:', error);
     }
-
-    renderer.render(scene, camera);
-}
-
-animate();
+);
