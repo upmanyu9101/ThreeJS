@@ -5,8 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Globe with Three.js</title>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        canvas {
+            display: block;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #b3e6cc; /* Light green background */
+            border: 2px solid #007bff; /* Blue border */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 80%;
+            max-height: 80%;
+            overflow: auto;
+        }
+        .popup-content {
+            color: #333; /* Dark text color */
+        }
+        .popup-button {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff; /* Blue button color */
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .popup-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
     </style>
 </head>
 <body>
@@ -14,5 +56,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Include your main script -->
     <script src="main.js" type="module"></script>
+
+    <!-- Popup Window -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <p>About upmanyu</p>
+            <p>BHOOO</p>
+            <button class="popup-button" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to close the popup
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        // Show popup when the page loads
+        window.addEventListener('load', function() {
+            document.getElementById('popup').style.display = 'block';
+        });
+    </script>
 </body>
 </html>

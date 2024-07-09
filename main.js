@@ -3,25 +3,37 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.134.0/examples/js
 import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 5); // Adjust camera position
 
-const renderer = new THREE.WebGLRenderer();
+// Set a light background color
+const backgroundColor = 0xf0f0f0;
+scene.background = new THREE.Color(backgroundColor);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio); // Improve quality
 document.body.appendChild(renderer.domElement);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight.position.set(0, 10, 0);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 10, 7.5);
 scene.add(directionalLight);
 
+
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.enableZoom = true;
+controls.enablePan = true; // Enable panning
+
 
 const loader = new GLTFLoader();
 loader.load(
-    'monkey.glb', // Ensure the path is correct relative to main.js
+    'lowpoly.glb', // Ensure the path is correct relative to main.js
     function (gltf) {
         const model = gltf.scene;
         scene.add(model);
@@ -64,3 +76,9 @@ loader.load(
         console.error('Error loading model:', error);
     }
 );
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
