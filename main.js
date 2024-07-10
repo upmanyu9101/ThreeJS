@@ -5,7 +5,7 @@ import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/l
 const scene = new THREE.Scene();
 
 // Set a light background color
-const backgroundColor = 0xf0f0f0;
+const backgroundColor = 0xf0f0f0; //0x87CEFA;
 scene.background = new THREE.Color(backgroundColor);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -23,17 +23,15 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(5, 10, 7.5);
 scene.add(directionalLight);
 
-
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
 controls.enablePan = true; // Enable panning
 
-
 const loader = new GLTFLoader();
 loader.load(
-    'lowpoly.glb', // Ensure the path is correct relative to main.js
+    'lowpoly_earth.glb', // Ensure the path is correct relative to main.js
     function (gltf) {
         const model = gltf.scene;
         scene.add(model);
@@ -76,6 +74,83 @@ loader.load(
         console.error('Error loading model:', error);
     }
 );
+
+let pins = []; // Array to hold the pin models
+
+// Function to create and add a pin to the scene
+function addPin(position, rotation) {
+    loader.load(
+        'map_pin.glb',
+        function (gltf) {
+            let pin = gltf.scene;
+            // Center the pin model
+            const box = new THREE.Box3().setFromObject(pin);
+            const center = box.getCenter(new THREE.Vector3());
+            pin.position.sub(center);
+
+            pin.position.copy(position);
+            pin.rotation.set(rotation.x, rotation.y, rotation.z);
+            pin.scale.set(0.4, 0.4, 0.4); // Initial scale of the pin (assuming same as original)
+            scene.add(pin);
+            pins.push(pin);
+        },
+        undefined,
+        function (error) {
+            console.error('Error loading pin model:', error);
+        }
+    );
+}
+
+// Example positions and rotations for 10 additional pins
+addPin(new THREE.Vector3(1.3,0.3,-2.8), new THREE.Euler(0, Math.PI / 2, 5));
+addPin(new THREE.Vector3(2.3,0.3,-2.4), new THREE.Euler(0, Math.PI / 2.3,5));
+addPin(new THREE.Vector3(-0.5,0.5,-2.45), new THREE.Euler(0, Math.PI / 1.7,5));
+//addPin(new THREE.Vector3(-2, 2, -1), new THREE.Euler(0, -Math.PI / 2, 0));
+//addPin(new THREE.Vector53(0, 2, -2), new THREE.Euler(Math.PI / 4, 0, 0));
+//addPin(new THREE.Vector3(1, 2, 2), new THREE.Euler(-Math.PI / 4, 0, 0));
+//addPin(new THREE.Vector3(-1, 2, -2), new THREE.Euler(Math.PI / 6, 0, 0));
+//addPin(new THREE.Vector3(-2, 2, 2), new THREE.Euler(-Math.PI / 6, 0, 0));
+//addPin(new THREE.Vector3(2, 2, 0), new THREE.Euler(0, 0, Math.PI / 3));
+//addPin(new THREE.Vector3(-2, 2, 0), new THREE.Euler(0, 0, -Math.PI / 3));
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onMouseClick(event) {
+    event.preventDefault();
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    for (let i = 0; i < intersects.length; i++) {
+        if (intersects[i].object === originalPin) {
+            console.log('Pin clicked'); // Debugging output
+            showPopup();
+            break;
+        }
+    }
+}
+
+function showPopup() {
+    const popup = document.getElementById('popup');
+    popup.style.display = 'block';
+}
+
+window.addEventListener('click', onMouseClick);
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+animate();
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
