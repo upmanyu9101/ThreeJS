@@ -105,8 +105,8 @@ function addPin(position, rotation) {
 addPin(new THREE.Vector3(1.3,0.3,-2.8), new THREE.Euler(0, Math.PI / 2, 5));
 addPin(new THREE.Vector3(2.3,0.3,-2.4), new THREE.Euler(0, Math.PI / 2.3,5));
 addPin(new THREE.Vector3(-0.5,0.5,-2.45), new THREE.Euler(0, Math.PI / 1.7,5));
-//addPin(new THREE.Vector3(-2, 2, -1), new THREE.Euler(0, -Math.PI / 2, 0));
-//addPin(new THREE.Vector53(0, 2, -2), new THREE.Euler(Math.PI / 4, 0, 0));
+addPin(new THREE.Vector3(0.1,-0.8,-3), new THREE.Euler(0, -Math.PI / 2,1.5));
+addPin(new THREE.Vector3(-1.3,-2.6,-1.6), new THREE.Euler(Math.PI / 1, 1, 1));
 //addPin(new THREE.Vector3(1, 2, 2), new THREE.Euler(-Math.PI / 4, 0, 0));
 //addPin(new THREE.Vector3(-1, 2, -2), new THREE.Euler(Math.PI / 6, 0, 0));
 //addPin(new THREE.Vector3(-2, 2, 2), new THREE.Euler(-Math.PI / 6, 0, 0));
